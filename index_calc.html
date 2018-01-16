@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<!--
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+-->
+<!DOCTYPE html>
+
+<html>
+    <head>
+        <title>TODO supply a title</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    </head>
+    <body>
+        <div>file:///C:/Users/evgen/Desktop/CallengeNetBeans/public_html/index.html η πάτα το play πάνω</div>
+    
+            <script>
+                        
+                // function input() {
+                // var x,h,b;
+                // x=document.getElementbyid('userinput');
+                // h=x.elements['h'].value;
+                
+                // b=x.elements['b'].value;
+                // h = '1000';
+                var C = 35;
+                var S = 500;
+                var gammac = 1.5;       // Cells(6,3)
+                var gammas = 1.15;      // Cells(8,3)
+                var b = 1000;           // [mm] Cells(19,1) 
+                var h = 400;            // [mm] Cells(20,1) 
+                var cover = 50;         // [mm] 
+                var fi = 20;            // [mm] Cells(23,1)
+                d = h-cover-fi/2;       // [mm] Cells(21,1)
+                var wmax = 0.15;        // [mm] Cells(24,1)
+                var kryp = 2;           // final creep coefficient Cells(9,12)
+                var k_1 = 1.6;          // 0.8 for high bond bars, 1.6 for bars with an effectively plain surface  Cells(9,6)
+                var k_4 = 0.425;        // Cells(9,9)
+                e = d-h/2;              // [mm] Cells(22,1)
+                fck = C;                // [MPa] Cells(6,6)
+                fcd = fck/gammac;       // [MPa] Cells(7,6)
+                var fcm = fck+8;        // [MPa]
+                if (fck>50){
+                var fctm = 2.12*log(1+fcm/10);  // [MPa] Cells(6,12)
+                }
+                else{
+                var fctm = 0.30*fck^(2/3);      // [MPa] 
+                }
+                    
+                var fctk = 0.7*fctm;    // [MPa] Cells(6,9)
+
+                var Es = 200;       // [GPa] Cells(8,12)
+                var Ecm = 34;       // [GPa] Cells(7,12)
+
+                var fyk = S;        // [MPa] Cells(8,6)
+                fyd = fyk/gammas;   // [MPa] Cells(8,9)
+                
+                var MEd_brott = 500; //[kNm] / always +                         Cells(13,1)
+                var NEd_brott = -300; //[kN] / + tension, - compression         Cells(14,1)
+                var MEd_bruk_kar = 300; //[kNm] / always +                    Cells(15,1)
+                var NEd_bruk_kar = -200; //[kNm] / + tension, - compression   Cells(16,1)
+                var MEd_bruk_kvasi = 200; //[kNm] / always +                    Cells(17,1)
+                var NEd_bruk_kvasi = -100; //[kNm] / + tension, - compression   Cells(18,1)       
+          
+                if (d>h) { 
+                document.write ("The effective height is bigger than the height of the cross-section")
+                }
+          
+                if (fck>50){
+                var eta = 1-(fck-50)/200;  
+                }
+                else{
+                var eta = 1;      
+                }
+                
+                fcd = fcd/eta;
+                fctd = fctk/gammac; // [MPa] Cells (7,9)
+                
+                // document.write(fctd)
+       
+                MEd_apo = MEd_brott-NEd_brott*e/1000; // [kNm]  Cells (26,1)
+                document.write("<br>");
+                document.write("MEd_apo = ") 
+                document.write(MEd_apo)
+                
+                var tmp = 1-2*(MEd_apo/((b/1000)*Math.pow(d/1000,2)*fcd*1000)); 
+                
+                document.write("<br>");
+                document.write("tmp = ") 
+                document.write(tmp)
+                                
+                if (tmp < 0) {
+                document.write("<br>");
+                document.write ("Change cross section geometry")
+                }
+                
+                if (fck > 50) {
+                lambda = 0.8-(fck-50)/400;      
+                }
+                else{
+                lambda = 0.8;      
+                }
+                
+                document.write("<br>");
+                document.write("lambda = ") 
+                document.write(lambda)           
+                
+                omega = 1-Math.sqrt(tmp,2)  // Cells (27,1)
+                document.write(Math.sqrt(tmp,2))
+                document.write("<br>");
+                document.write("omega = ") 
+                document.write(omega) 
+                
+                if (omega < 0) {
+                document.write("<br>");
+                document.write ("Change cross section geometry")
+                }
+                
+                document.write("<br>");
+                document.write("fck = ") 
+                document.write(fck)
+                
+                if (fck == 55) { 
+                ecu = 0.0031;   
+                }
+                else if (fck == 60) { 
+                ecu = 0.0029;   
+                }
+                else if (fck == 70) { 
+                ecu = 0.0027;   
+                }
+                else if (fck == 80) { 
+                ecu = 0.0026;   
+                }
+                else if (fck == 90) { 
+                ecu = 0.0026;   
+                }
+                else { 
+                ecu = 0.0035;   
+                }
+                document.write("<br>");
+                document.write("ecu = ") 
+                document.write(ecu)
+                
+                omega_bal = lambda*(ecu*Es*1000000000/(fyk*1000000+ecu*Es*1000000000));
+                
+                if (omega > omega_bal) { 
+                document.write ("Double reinforced beam")
+                }
+                
+                document.write("<br>");
+                document.write("omega_bal = ") 
+                document.write(omega_bal)
+                
+                var Auls = (MEd_apo/(1000*fyd*(d/1000)*(1-(omega/2)))+NEd_brott/(fyd*1000))*1000000;  // [mm] Cells(28,1)
+
+                document.write("<br>");
+                document.write("Auls = ") 
+                document.write(Auls)
+                
+                if (Auls < 0) { 
+                document.write ("Negative reinforcement")
+                }
+                
+                area = (b/1000)*(h/1000);
+                document.write("<br>");
+                document.write("area = ") 
+                document.write(area)                
+                
+                if (NEd_bruk_kar == 0) { 
+                var sigma_n = 0;
+                if (fctm > (1.6-h/1000)*fctm || fctm == (1.6 - h / 1000) * fctm) {
+                var fctm_fl = fctm;
+                }
+                else
+                var fctm_fl = (1.6-h/1000)*fctm; // [MPa] Cells(31,1)
+                }
+                else {
+                var sigma_n = NEd_bruk_kar/1000/area;  
+                var fctm_fl = fctm;
+                }
+                
+                document.write("<br>");
+                document.write("sigma_n = ") 
+                document.write(sigma_n)                                    
+            
+                document.write("<br>");
+                document.write("fctm_fl = ") 
+                document.write(fctm_fl)
+                
+                var w_u = (b/1000)*Math.pow((h/1000),2)/6; // [m^3] Cells(41,1)
+                document.write("<br>");
+                document.write("w_u = ") 
+                document.write(w_u)
+                
+                var sigma_ct = sigma_n+(MEd_bruk_kar/1000)/w_u; // [m^3] Cells(30,1)
+                
+                if (fctm_fl > sigma_ct) { 
+                sigm_n_kvasi = (NEd_bruk_kvasi/1000)/area;    
+                sigm_m_kvasi = (MEd_bruk_kvasi/1000)/w_u; 
+                
+                sigma_c_kvasi = -(sigm_n_kvasi-sigm_m_kvasi); // Cells(34,1)
+                
+                sigm_n_kar = (NEd_bruk_kar/1000)/area;    
+                sigm_m_kar = (MEd_bruk_kar/1000)/w_u; 
+                
+                sigma_c_kar = -(sigm_n_kar-sigm_m_kar); // Cells(52,1)
+                var Asls = Auls;
+                
+                if (sigma_c_kvasi > 0.45*fck) {
+                document.write ("Compressive stresses of conrete in Quasi-Permanent load case > 0.45*fck, Consider non-linear creep according EN 1992-1-1:2004, 3.1.4(4)")
+                }
+                if (sigma_c_kar > 0.60*fck) {
+                document.write ("Compressive stresses of conrete in Characteristic load case > 0.60*fck")
+                }
+                
+                document.write ("The mean flexural tensile strength is bigger than the characteristic tensile strength")
+                }
+            
+                B = b/1000; // [m]
+                H = h/1000; // [m]
+                d = d/1000; // [m]
+                Alfa = (Es*(1+kryp))/Ecm;
+                M = MEd_bruk_kvasi/1000;    // [MNm]
+                N0 = NEd_bruk_kvasi/1000;   // [MN]
+                // 
+                document.write("<br>");
+                document.write("B = ") 
+                document.write(B)
+                document.write("<br>");
+                document.write("H = ") 
+                document.write(H)
+                document.write("<br>");
+                document.write("d = ") 
+                document.write(d)
+                document.write("<br>");
+                document.write("Alfa = ") 
+                document.write(Alfa)
+                document.write("<br>");
+                document.write("M = ") 
+                document.write(M)
+                document.write("<br>");
+                document.write("N0 = ") 
+                document.write(N0)
+                
+         // SLS
+         // Calc_SIGMAs    
+                var k;              
+                for (var k = 0; k < 20 ; k++) {
+                
+                // Asls - 1 array
+                var Asls = new Array(k)
+                for (var i=0; i < 3; i++) {
+                    Asls[i] = new Array(3);
+                }        
+                
+                for (var i = 0; i < 3; i++){
+                    for (var j = 0; i < 3; i++) {
+                    
+                    }                    
+                document.write("<br/>");
+                }
+                        
+                // Write Asls        
+                document.write("<br>"); 
+                document.write("Asls = ") 
+                for (var i = 0; i < 3; i++){
+                    for (var j = 0; i < 3; i++) {
+                    document.write(Asls[i][j] + "&emsp;");
+                    }                    
+                document.write("<br/>");
+                }
+            
+                function Asarm(k) {
+                return Asls(k)/1000000;                   
+               }
+               
+                document.write("<br>");
+                document.write("Asarm = ") 
+                document.write(Asarm(k))
+                
+                for (var N = 1; N < 10 ; N++) {            
+               // if (abs(M*1000) > 0.1 && M > 0) {
+                if (Math.abs(M*1000) > 0.1 && M > 0) {
+                var x1 = H/3;
+                document.write("<br>");
+                document.write("x1 = ") 
+                document.write(x1)
+                
+                function SIGMc1(k) {
+                return M / ((B * x1 / 2 * (H / 2 - (x1 / 3))) + (Alfa * ((d - x1) / x1) * Asarm(k) * (d - (H / 2))));                   
+               }
+                function SIGMs1(k) {
+                return Alfa * SIGMc1(k) * (d - x1) / x1;                   
+               }
+                function Ds1(k) {
+                return SIGMs1(k) * Asarm(k);                   
+               }
+              
+              
+                document.write("<br>");
+                document.write("SIGMc1 = ") 
+                document.write(SIGMc1(k))
+                
+                
+                
+               }   
+                   
+                                   
+                   
+                   
+                   
+               }
+                document.write("<br>");
+                document.write("k = ") 
+                document.write(k)
+                document.write("<br>");
+                document.write(Asls(k))
+                document.write("<br>");
+                document.write(Asarm(k))
+               }
+              //  document.write(l)
+              
+            
+                
+            // window.alert('sometext');
+                // if d
+            //}
+                // document.write(h,b,fctm,e,tmp)
+            //    document.write('Pame agorina mou...')
+                
+            </script>
+    </body>
+
+</html>
